@@ -20,8 +20,8 @@ class InimCloud {
     this.armScenario = config.armScenario || 1;
     this.disarmScenario = config.disarmScenario || 0;
     this.pollInterval = (config.pollInterval || 10) * 1000;
-    this.token = 1;
-    this.clientId = 1;
+    this.token = '0';
+    this.clientId = '0';
     this.deviceId = null;
     this.currentState = 3;
     this.targetState = 3;
@@ -52,7 +52,7 @@ class InimCloud {
   apiRequest(method, params, callback) {
     const payload = {
       Node: '',
-      Name: 'AlienMobilePro',
+      Name: 'Inim Home',
       ClientIP: '',
       Method: method,
       ClientId: this.clientId,
