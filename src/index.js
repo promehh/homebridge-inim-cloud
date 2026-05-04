@@ -94,7 +94,7 @@ class InimCloud {
         return;
       }
       if (res.Status !== 0) {
-        this.log('Autenticazione fallita:', res.ErrMsg || JSON.stringify(res));
+        this.log('Autenticazione fallita:', JSON.stringify(res));
         setTimeout(() => this.authenticate(callback), 30000);
         return;
       }
