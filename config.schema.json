@@ -1,0 +1,65 @@
+{
+  "pluginAlias": "InimCloud",
+  "pluginType": "accessory",
+  "singular": false,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Nome accessorio",
+        "type": "string",
+        "default": "Allarme Casa",
+        "required": true
+      },
+      "email": {
+        "title": "Email account INIM Cloud",
+        "type": "string",
+        "format": "email",
+        "required": true
+      },
+      "password": {
+        "title": "Password account INIM Cloud",
+        "type": "string",
+        "required": true
+      },
+      "deviceIndex": {
+        "title": "Indice centrale (0 = prima centrale)",
+        "type": "integer",
+        "default": 0,
+        "minimum": 0
+      },
+      "armScenario": {
+        "title": "Numero scenario inserimento totale",
+        "type": "integer",
+        "default": 1,
+        "minimum": 1
+      },
+      "disarmScenario": {
+        "title": "Numero scenario disinserimento",
+        "type": "integer",
+        "default": 0,
+        "minimum": 0
+      },
+      "pollInterval": {
+        "title": "Intervallo aggiornamento stato (secondi)",
+        "type": "integer",
+        "default": 10,
+        "minimum": 5
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "section",
+      "title": "Credenziali INIM Cloud",
+      "items": ["email", "password"]
+    },
+    {
+      "type": "section",
+      "title": "Configurazione centrale",
+      "expandable": true,
+      "expanded": false,
+      "items": ["name", "deviceIndex", "armScenario", "disarmScenario", "pollInterval"]
+    }
+  ]
+}
