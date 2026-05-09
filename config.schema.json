@@ -34,12 +34,12 @@
       "armScenario": {
         "title": "ID scenario inserimento totale",
         "type": "integer",
-        "default": 1
+        "default": 0
       },
       "disarmScenario": {
         "title": "ID scenario disinserimento",
         "type": "integer",
-        "default": 0
+        "default": 1
       },
       "pollInterval": {
         "title": "Intervallo aggiornamento stato (secondi)",
