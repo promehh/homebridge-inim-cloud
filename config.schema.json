@@ -21,6 +21,11 @@
         "type": "string",
         "required": true
       },
+      "userCode": {
+        "title": "PIN utente allarme (codice tastiera)",
+        "type": "string",
+        "required": true
+      },
       "deviceIndex": {
         "title": "Indice centrale (0 = prima centrale)",
         "type": "integer",

@@ -1,6 +1,6 @@
 {
   "name": "homebridge-inim-cloud",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Homebridge plugin for INIM alarm systems via INIM Cloud API",
   "license": "MIT",
   "type": "module",
