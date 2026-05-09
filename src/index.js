@@ -11,6 +11,7 @@ export default (homebridge) => {
       this.name = config.name || 'Allarme Casa';
       this.email = config.email;
       this.password = config.password;
+      this.userCode = config.userCode || '';
       this.deviceIndex = config.deviceIndex ?? 0;
       this.armScenario = config.armScenario ?? 1;
       this.disarmScenario = config.disarmScenario ?? 0;
@@ -19,7 +20,7 @@ export default (homebridge) => {
       this.clientId = null;
       this.token = null;
       this.deviceId = null;
-      this.currentState = 3; // DISARMED
+      this.currentState = 3;
       this.targetState = 3;
 
       this.securityService = new Service.SecuritySystem(this.name);
@@ -35,12 +36,22 @@ export default (homebridge) => {
       this.infoService
         .setCharacteristic(Characteristic.Manufacturer, 'INIM Electronics')
         .setCharacteristic(Characteristic.Model, 'Prime Cloud Plugin')
-        .setCharacteristic(Characteristic.SerialNumber, '2.0.0');
+        .setCharacteristic(Characteristic.SerialNumber, '3.0.0');
 
-      this.authenticate().then(() => this.getDeviceList()).then(() => {
+      this.start();
+    }
+
+    async start() {
+      try {
+        await this.authenticate();
+        await this.getDeviceList();
+        if (this.userCode) await this.authenticateCode();
         this.pollStatus();
         setInterval(() => this.pollStatus(), this.pollInterval);
-      }).catch((e) => this.log.error('Errore avvio:', e.message));
+      } catch (e) {
+        this.log.error('Errore avvio:', e.message);
+        setTimeout(() => this.start(), 30000);
+      }
     }
 
     apiGet(path) {
@@ -53,10 +64,10 @@ export default (homebridge) => {
         };
         const req = https.request(options, (res) => {
           let data = '';
-          res.on('data', (chunk) => { data += chunk; });
+          res.on('data', (c) => { data += c; });
           res.on('end', () => {
             try { resolve(JSON.parse(data)); }
-            catch (e) { reject(new Error('Parse error: ' + e.message + ' | raw: ' + data.substring(0, 300))); }
+            catch (e) { reject(new Error('Parse error: ' + data.substring(0, 200))); }
           });
         });
         req.on('error', reject);
@@ -64,70 +75,59 @@ export default (homebridge) => {
       });
     }
 
-    buildAuthPath() {
-      // Formato documentato dalla community INIM:
-      // ClientId e Token sono numeri (0) nella prima chiamata
-      // User e Password vanno dentro Params
-      const payload = {
-        Node: '',
-        Name: 'AlienMobilePro',
-        ClientIP: '',
-        Method: 'Authenticate',
-        ClientId: 0,
-        Token: 0,
-        Params: {
-          User: this.email,
-          Password: this.password
-        }
-      };
-      return '/?req=' + encodeURIComponent(JSON.stringify(payload));
+    authPath(method, params) {
+      return '/?req=' + encodeURIComponent(JSON.stringify({
+        Node: '', Name: 'AlienMobilePro', ClientIP: '', Method: method, Params: params
+      }));
     }
 
     buildPath(method, params) {
-      const payload = {
-        Node: '',
-        Name: 'AlienMobilePro',
-        ClientIP: '',
-        Method: method,
-        ClientId: this.clientId,
-        Token: this.token,
-        Params: params
-      };
-      return '/?req=' + encodeURIComponent(JSON.stringify(payload));
+      return '/?req=' + encodeURIComponent(JSON.stringify({
+        Node: '', Name: 'AlienMobilePro', ClientIP: '',
+        Method: method, ClientId: this.clientId, Token: this.token, Params: params
+      }));
     }
 
     async authenticate() {
-      this.log('Autenticazione INIM Cloud...');
-      try {
-        const res = await this.apiGet(this.buildAuthPath());
-        this.log('Risposta auth:', JSON.stringify(res));
-        if (res.Status !== 0) {
-          throw new Error(res.ErrMsg || 'Auth fallita status: ' + res.Status);
-        }
-        this.token = res.Data.Token;
-        this.clientId = res.Data.ClientId;
-        this.log('Autenticazione OK — ClientId:', this.clientId, '| Token:', this.token);
-      } catch (e) {
-        this.log.error('Errore autenticazione:', e.message);
-        await new Promise(r => setTimeout(r, 30000));
-        return this.authenticate();
-      }
+      this.log('Step 1: Autenticazione email/password...');
+      const res = await this.apiGet(this.authPath('Authenticate', {
+        User: this.email,
+        Password: this.password
+      }));
+      this.log('Risposta auth:', JSON.stringify(res));
+      if (res.Status !== 0) throw new Error('Auth fallita: ' + res.ErrMsg + ' (Status ' + res.Status + ')');
+      this.clientId = res.Data.ClientId;
+      this.token = res.Data.Token;
+      this.log('Step 1 OK — ClientId:', this.clientId, '| Token:', this.token);
     }
 
     async getDeviceList() {
-      this.log('Recupero lista centrali...');
-      try {
-        const res = await this.apiGet(this.buildPath('GetDeviceList', {}));
-        this.log('Risposta device list:', JSON.stringify(res));
-        if (res.Status !== 0) throw new Error(res.ErrMsg);
-        const devices = res.Data;
-        if (!devices?.length) throw new Error('Nessuna centrale trovata');
-        const device = devices[this.deviceIndex];
-        if (!device) throw new Error('Indice centrale non valido, disponibili: ' + devices.length);
-        this.deviceId = device.DeviceId;
-        this.log('Centrale trovata:', device.Name, '| DeviceId:', this.deviceId);
-      } catch (e) {
-        this.log.error('Errore GetDeviceList:', e.message);
+      this.log('Step 2: Recupero lista centrali...');
+      const res = await this.apiGet(this.buildPath('GetDeviceList', {}));
+      this.log('Device list:', JSON.stringify(res));
+      if (res.Status !== 0) throw new Error('GetDeviceList fallita: ' + res.ErrMsg);
+      const devices = res.Data;
+      if (!devices?.length) throw new Error('Nessuna centrale trovata');
+      const device = devices[this.deviceIndex];
+      if (!device) throw new Error('Indice non valido. Disponibili: ' + devices.length);
+      this.deviceId = device.DeviceId;
+      this.log('Step 2 OK — Centrale:', device.Name, '| DeviceId:', this.deviceId);
+    }
+
+    async authenticateCode() {
+      this.log('Step 3: Autenticazione PIN...');
+      const res = await this.apiGet(this.buildPath('AuthenticateCode', {
+        DeviceId: this.deviceId,
+        Code: parseInt(this.userCode),
+        Role: '1'
+      }));
+      this.log('Risposta PIN:', JSON.stringify(res));
+      if (res.Status !== 0) {
+        this.log.warn('PIN non accettato (continuo senza):', res.ErrMsg);
+      } else {
+        if (res.Data?.Token) this.token = res.Data.Token;
+        if (res.Data?.ClientId) this.clientId = res.Data.ClientId;
+        this.log('Step 3 OK — token aggiornato');
       }
     }
 
@@ -135,14 +135,12 @@ export default (homebridge) => {
       if (!this.token || !this.deviceId) return;
       try {
         const res = await this.apiGet(this.buildPath('RequestPoll', {
-          DeviceId: this.deviceId,
-          Type: 5
+          DeviceId: this.deviceId, Type: 5
         }));
         if (res.Status === 2) {
-          this.log('Token scaduto, riautentico...');
-          this.token = null;
-          this.clientId = null;
-          await this.authenticate();
+          this.log('Token scaduto, riavvio autenticazione...');
+          this.token = null; this.clientId = null;
+          await this.start();
           return;
         }
         if (res.Status !== 0 || !res.Data) return;
@@ -174,8 +172,7 @@ export default (homebridge) => {
       this.log('Attivazione scenario:', scenarioId);
       try {
         const res = await this.apiGet(this.buildPath('ActivateScenario', {
-          DeviceId: this.deviceId,
-          ScenarioId: scenarioId
+          DeviceId: this.deviceId, ScenarioId: scenarioId
         }));
         if (res.Status !== 0) throw new Error(res.ErrMsg || 'Errore scenario');
         this.targetState = value;
