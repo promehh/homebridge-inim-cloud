@@ -26,26 +26,62 @@
         "type": "string",
         "required": true
       },
-      "deviceIndex": {
-        "title": "Indice centrale (0 = prima centrale)",
+      "scenarioDisarmed": {
+        "title": "Scenario INIM → Disarmato (HomeKit)",
         "type": "integer",
-        "default": 0
+        "default": 0,
+        "description": "ID scenario INIM per stato Disarmato"
       },
-      "armScenario": {
-        "title": "ID scenario inserimento totale",
+      "scenarioHome": {
+        "title": "Scenario INIM → Casa (HomeKit)",
         "type": "integer",
-        "default": 0
+        "default": 1,
+        "description": "ID scenario INIM per stato Casa (Stay Armed)"
       },
-      "disarmScenario": {
-        "title": "ID scenario disinserimento",
+      "scenarioNight": {
+        "title": "Scenario INIM → Notte (HomeKit)",
         "type": "integer",
-        "default": 1
+        "default": 2,
+        "description": "ID scenario INIM per stato Notte (Night Armed)"
+      },
+      "scenarioAway": {
+        "title": "Scenario INIM → Fuori (HomeKit)",
+        "type": "integer",
+        "default": 3,
+        "description": "ID scenario INIM per stato Fuori (Away Armed)"
       },
       "pollInterval": {
         "title": "Intervallo aggiornamento stato (secondi)",
         "type": "integer",
-        "default": 15
+        "default": 15,
+        "minimum": 5
       }
     }
-  }
+  },
+  "layout": [
+    {
+      "type": "section",
+      "title": "Credenziali INIM Cloud",
+      "items": ["name", "email", "password", "userCode"]
+    },
+    {
+      "type": "section",
+      "title": "Mappatura scenari INIM → HomeKit",
+      "expandable": true,
+      "expanded": true,
+      "items": [
+        "scenarioDisarmed",
+        "scenarioHome",
+        "scenarioNight",
+        "scenarioAway"
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Avanzate",
+      "expandable": true,
+      "expanded": false,
+      "items": ["pollInterval"]
+    }
+  ]
 }

@@ -1,11 +1,23 @@
 {
   "name": "homebridge-inim-cloud",
-  "version": "4.0.0",
-  "description": "Homebridge plugin for INIM alarm systems via INIM Cloud API",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for INIM alarm systems (Prime/PrimeLAN) via INIM Cloud API",
   "license": "MIT",
+  "author": {
+    "name": "promehh",
+    "url": "https://github.com/promehh"
+  },
   "type": "module",
   "main": "src/index.js",
-  "keywords": ["homebridge-plugin", "inim", "alarm", "security"],
+  "keywords": [
+    "homebridge-plugin",
+    "inim",
+    "alarm",
+    "security",
+    "homekit",
+    "siri",
+    "prime"
+  ],
   "engines": {
     "homebridge": "^1.6.0 || ^2.0.0",
     "node": "^22.0.0"
@@ -14,5 +26,13 @@
     "pluginType": "accessory",
     "pluginAlias": "InimCloud",
     "schema": "config.schema.json"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/promehh/homebridge-inim-cloud"
+  },
+  "bugs": {
+    "url": "https://github.com/promehh/homebridge-inim-cloud/issues"
+  },
+  "homepage": "https://github.com/promehh/homebridge-inim-cloud#readme"
 }
