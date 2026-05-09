@@ -14,7 +14,6 @@
       "email": {
         "title": "Email account INIM Cloud",
         "type": "string",
-        "format": "email",
         "required": true
       },
       "password": {
@@ -25,41 +24,23 @@
       "deviceIndex": {
         "title": "Indice centrale (0 = prima centrale)",
         "type": "integer",
-        "default": 0,
-        "minimum": 0
+        "default": 0
       },
       "armScenario": {
-        "title": "Numero scenario inserimento totale",
+        "title": "ID scenario inserimento totale",
         "type": "integer",
-        "default": 1,
-        "minimum": 1
+        "default": 1
       },
       "disarmScenario": {
-        "title": "Numero scenario disinserimento",
+        "title": "ID scenario disinserimento",
         "type": "integer",
-        "default": 0,
-        "minimum": 0
+        "default": 0
       },
       "pollInterval": {
         "title": "Intervallo aggiornamento stato (secondi)",
         "type": "integer",
-        "default": 10,
-        "minimum": 5
+        "default": 15
       }
     }
-  },
-  "layout": [
-    {
-      "type": "section",
-      "title": "Credenziali INIM Cloud",
-      "items": ["email", "password"]
-    },
-    {
-      "type": "section",
-      "title": "Configurazione centrale",
-      "expandable": true,
-      "expanded": false,
-      "items": ["name", "deviceIndex", "armScenario", "disarmScenario", "pollInterval"]
-    }
-  ]
+  }
 }
