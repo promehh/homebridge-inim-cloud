@@ -1,6 +1,6 @@
 {
   "name": "homebridge-inim-cloud",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Homebridge plugin for INIM alarm systems (Prime/PrimeLAN) via INIM Cloud API",
   "license": "MIT",
   "author": {
@@ -23,7 +23,7 @@
     "node": "^22.0.0"
   },
   "homebridge": {
-    "pluginType": "platform",
+    "pluginType": "accessory",
     "pluginAlias": "InimCloud",
     "schema": "config.schema.json"
   },
