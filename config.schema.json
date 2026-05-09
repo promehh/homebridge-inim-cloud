@@ -1,14 +1,14 @@
 {
   "pluginAlias": "InimCloud",
-  "pluginType": "accessory",
-  "singular": false,
+  "pluginType": "platform",
+  "singular": true,
   "schema": {
     "type": "object",
     "properties": {
       "name": {
-        "title": "Nome accessorio",
+        "title": "Nome piattaforma",
         "type": "string",
-        "default": "Allarme Casa",
+        "default": "INIM Cloud",
         "required": true
       },
       "email": {
@@ -26,29 +26,34 @@
         "type": "string",
         "required": true
       },
+      "accessoryName": {
+        "title": "Nome accessorio in HomeKit",
+        "type": "string",
+        "default": "Allarme Casa"
+      },
       "scenarioDisarmed": {
-        "title": "Scenario INIM → Disarmato (HomeKit)",
+        "title": "Scenario INIM → Disarmato",
         "type": "integer",
         "default": 0,
         "description": "ID scenario INIM per stato Disarmato"
       },
       "scenarioHome": {
-        "title": "Scenario INIM → Casa (HomeKit)",
+        "title": "Scenario INIM → Casa (Stay Armed)",
         "type": "integer",
         "default": 1,
-        "description": "ID scenario INIM per stato Casa (Stay Armed)"
+        "description": "ID scenario INIM per stato Casa"
       },
       "scenarioNight": {
-        "title": "Scenario INIM → Notte (HomeKit)",
+        "title": "Scenario INIM → Notte (Night Armed)",
         "type": "integer",
         "default": 2,
-        "description": "ID scenario INIM per stato Notte (Night Armed)"
+        "description": "ID scenario INIM per stato Notte"
       },
       "scenarioAway": {
-        "title": "Scenario INIM → Fuori (HomeKit)",
+        "title": "Scenario INIM → Fuori (Away Armed)",
         "type": "integer",
         "default": 3,
-        "description": "ID scenario INIM per stato Fuori (Away Armed)"
+        "description": "ID scenario INIM per stato Fuori"
       },
       "pollInterval": {
         "title": "Intervallo aggiornamento stato (secondi)",
@@ -62,19 +67,14 @@
     {
       "type": "section",
       "title": "Credenziali INIM Cloud",
-      "items": ["name", "email", "password", "userCode"]
+      "items": ["name", "email", "password", "userCode", "accessoryName"]
     },
     {
       "type": "section",
       "title": "Mappatura scenari INIM → HomeKit",
       "expandable": true,
       "expanded": true,
-      "items": [
-        "scenarioDisarmed",
-        "scenarioHome",
-        "scenarioNight",
-        "scenarioAway"
-      ]
+      "items": ["scenarioDisarmed", "scenarioHome", "scenarioNight", "scenarioAway"]
     },
     {
       "type": "section",
